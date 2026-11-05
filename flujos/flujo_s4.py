@@ -9,7 +9,6 @@ from pathlib import Path
 from typing import Literal
 
 from langchain_anthropic import ChatAnthropic
-from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 from pydantic import BaseModel
 
@@ -21,7 +20,7 @@ from agentes.triage import diagnosticar
 from flujos import flujo_s2 as s2
 from flujos import flujo_s3 as s3
 from flujos.verificacion import ejecutar_pruebas, redesplegar
-from flujos.util import dibuja_grafo
+from flujos.util import crear_checkpointer, dibuja_grafo
 
 MAX_CICLOS = 2
 
@@ -143,7 +142,7 @@ def construir_grafo():
     for correccion in ("corregir_codigo", "corregir_pruebas", "corregir_despliegue"):
         g.add_edge(correccion, "pruebas_e2e")                          # el ciclo: corregir y volver a probar
     g.add_edge("fin", END)
-    app = g.compile(checkpointer=InMemorySaver())
+    app = g.compile(checkpointer=crear_checkpointer(), name="s4")   # name: prefijo del thread_id
     #DIBUJA EL GRAFO ! 
     dibuja_grafo(app,"flujo_s4")
     return app

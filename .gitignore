@@ -9,3 +9,4 @@ app/backend/datos/
 app/test-results/
 ejemplos/salidas/
 .pytest_cache/
+checkpoints/
