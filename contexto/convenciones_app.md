@@ -48,7 +48,7 @@ Todo elemento que una prueba necesite tocar lleva `data-testid` con estos nombre
 
 # Convenciones de vacaciones (HU-10)
 
-Complementa `contexto/convenciones_app.md`: mismo backend (FastAPI + SQLite), mismo frontend (React) y las mismas reglas de estilo. Las reglas de negocio están en `contexto/reglas_vacaciones.md`.
+Complementa las secciones anteriores de este archivo: mismo backend (FastAPI + SQLite), mismo frontend (React) y las mismas reglas de estilo. Las reglas de negocio están en `contexto/reglas_negocio.md`, sección «Reglas de vacaciones (HU-10)».
 
 ## Datos
 

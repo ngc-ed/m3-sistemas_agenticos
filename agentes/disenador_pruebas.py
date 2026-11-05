@@ -36,6 +36,12 @@ Cómo trabajas:
 2. Para cada escenario escribe al menos un caso de nivel "api". Si el escenario involucra la pantalla,
    escribe además uno de nivel "e2e" cuyos pasos mencionen los data-testid que se usan.
 3. Usa datos concretos. Para correos usa el dominio corporativo empresa.com.
+   En vacaciones (HU-10) lee también contexto/reglas_negocio.md. Cada caso indica en "datos" la fecha_ingreso
+   del empleado (pasada, nunca futura) y fechas fijas de 2026 o 2027 en formato AAAA-MM-DD, tomadas de las
+   tablas de ejemplos y de festivos. Nunca uses la fecha de hoy ni fechas relativas («hoy», «mañana»).
+   En las consultas de saldo indica siempre "anio". Si el caso necesita días ya usados (tope), lista
+   en "datos" cada solicitud previa con sus fechas. El caso de empleado inexistente indica un empleado_id
+   que no existe en lugar de fecha_ingreso.
 4. Guarda los casos llamando a la herramienta guardar_casos (no escribas el JSON a mano).
    - "nivel" solo puede ser "api" o "e2e".
    - En "datos" TODOS los valores son texto: "201", no 201; para un campo vacío usa "", nunca null.
