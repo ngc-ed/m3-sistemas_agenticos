@@ -7,16 +7,14 @@ import sys
 from pathlib import Path
 from typing import Annotated, Literal, TypedDict
 
-from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 from langgraph.types import Command, interrupt
-"""QUITAR labs !!!! """
 from agentes import desarrollador
 from agentes.analista import generar_criterios, preguntas_abiertas
 from agentes.base import hu_de
 from agentes.disenador_pruebas import disenar_casos
 from flujos.verificacion import verificar_app
-from flujos.util import dibuja_grafo
+from flujos.util import crear_checkpointer, dibuja_grafo
 MAX_INTENTOS = 2
 
 
@@ -118,22 +116,42 @@ def construir_grafo():
     g.add_edge("construir", "verificar")
     g.add_conditional_edges("verificar", despues_de_verificar)
     g.add_edge("fin", END)
-    app = g.compile(checkpointer=InMemorySaver())
+    app = g.compile(checkpointer=crear_checkpointer(), name="s2")   # name: prefijo del thread_id
     #YA DIBUJA EL GRAFO ! 
     dibuja_grafo(app,"flujo_s2")
     return app
 
 
 def ejecutar(app, historia: str) -> dict:
-    """Corre el flujo y atiende cada pausa humana desde la terminal."""
-    cfg = {"configurable": {"thread_id": Path(historia).stem}}
-    out = app.invoke({"historia": str(Path(historia).resolve())}, cfg)
+    """Corre el flujo y atiende cada pausa humana desde la terminal.
+
+    El hilo (thread_id) es el nombre del flujo más el de la historia, por ejemplo
+    «s4:HU-10-solicitar-vacaciones», así que una pausa de flujo_s3 no se ofrece al correr flujo_s4.
+    Su estado se guarda en checkpoints/flujo.db (ver flujos.util.crear_checkpointer). Regla para retomar:
+    - Si el hilo tiene una pausa pendiente (por ejemplo, la aprobación del plan), se pregunta en la
+      terminal si se retoma. Con «si», el flujo sigue desde esa pausa sin repetir los nodos que ya
+      terminaron, y la bitácora registra «Ejecución retomada desde el checkpoint».
+    - Con «no», o si no hay pausa pendiente, el hilo se borra y la ejecución empieza de cero. Así la
+      bitácora y el costo, que se acumulan, no se mezclan con la ejecución anterior.
+    """
+    hilo = f"{app.name}:{Path(historia).stem}"
+    cfg = {"configurable": {"thread_id": hilo}}
+    pendientes = [i for tarea in app.get_state(cfg).tasks for i in tarea.interrupts]
+    retomar = bool(pendientes) and input(
+        f"Hay una ejecución en pausa de {hu_de(Path(historia))}. ¿Retomar? (si/no): ").strip().lower() == "si"
+    if retomar:
+        out = {"__interrupt__": pendientes}             # se vuelve a mostrar la pausa guardada
+    else:
+        app.checkpointer.delete_thread(hilo)            # de cero: nada de la ejecución anterior
+        out = app.invoke({"historia": str(Path(historia).resolve())}, cfg)
     while "__interrupt__" in out:
         pausa = out["__interrupt__"][0].value
         for clave in ("preguntas", "plan", "diagnostico"):
             if clave in pausa:
                 print(f"\n--- {clave.upper()} ---\n{pausa[clave]}")
-        out = app.invoke(Command(resume=input(pausa["pregunta"] + ": ")), cfg)
+        aviso = {"bitacora": ["Ejecución retomada desde el checkpoint"]} if retomar else None
+        out = app.invoke(Command(resume=input(pausa["pregunta"] + ": "), update=aviso), cfg)
+        retomar = False                                 # el aviso se escribe una sola vez
     return out
 
 
