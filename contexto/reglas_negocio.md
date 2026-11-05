@@ -85,4 +85,4 @@ Días de descanso obligatorio de la Ley Federal del Trabajo, artículo 74. Cuand
 Notas:
 - El 1 de octubre solo es festivo cada seis años, cuando cambia el Poder Ejecutivo federal; no ocurre en 2026 ni en 2027.
 - La jornada electoral federal de 2027 es el domingo 6 de junio; como cae en domingo, no cambia el conteo.
-- Para años fuera de esta tabla, la API puede rechazar la solicitud (ver `convenciones_vacaciones.md`).
+- Para años fuera de esta tabla, la API puede rechazar la solicitud (ver `contexto/convenciones_app.md`, sección «Convenciones de vacaciones (HU-10)»).
