@@ -19,8 +19,12 @@ Cómo trabajas:
    Característica, Escenario, Dado, Cuando, Entonces, Y.
 3. Incluye el camino feliz y un escenario de error por cada regla de negocio que aplique a ESTA historia.
 4. Cada escenario se puede verificar desde la pantalla o la API: datos concretos, nada de «funciona bien».
-5. No inventes reglas. Si falta información, agrégala al final como comentarios bajo `# Preguntas abiertas`.
-6. Responde al final con una sola línea: cuántos escenarios escribiste."""
+5. Solo escribe pasos de pantalla si contexto/convenciones_app.md deja llegar a esa pantalla. Si la pantalla
+   no ofrece esa acción, el escenario se prueba solo por API (la petición HTTP, el código y el `detail`).
+   Ejemplo: solicitar vacaciones para un empleado de baja; solo los empleados activos tienen el botón
+   `vacaciones-abrir-{{empleado_id}}`, así que ese escenario no lleva pasos de pantalla.
+6. No inventes reglas. Si falta información, agrégala al final como comentarios bajo `# Preguntas abiertas`.
+7. Responde al final con una sola línea: cuántos escenarios escribiste."""
 
 
 def escenarios(gherkin: str) -> list[str]:
@@ -31,7 +35,11 @@ def preguntas_abiertas(gherkin: str) -> list[str]:
     if "# Preguntas abiertas" not in gherkin:
         return []
     bloque = gherkin.split("# Preguntas abiertas", 1)[1]
-    return [l.lstrip("# -").strip() for l in bloque.splitlines() if l.strip().lstrip("#").strip()]
+    lineas = [l.lstrip("# -").strip() for l in bloque.splitlines() if l.strip().lstrip("#").strip()]
+    # «Ninguna», «No hay», «N/A»... dicen que no hay preguntas; la nota puede seguir en otras líneas
+    if lineas and re.match(r"(ninguna|ninguno|no hay|sin preguntas|n/?a)\b", lineas[0], flags=re.IGNORECASE):
+        return []
+    return lineas
 
 
 def validar_gherkin(texto: str, hu: str = "") -> list[str]:
@@ -163,6 +171,7 @@ def generar_criterios(historia: Path, max_intentos: int | None = None) -> Path:
             else [f"No se escribió {rel(destino)}."]
         if not problemas:
             return destino
+        print(f"  Intento {intento} rechazado. Problemas del validador:\n  - " + "\n  - ".join(problemas))
         # Reflexión guiada por un evaluador determinista: el agente recibe los problemas y corrige
         tarea += "\n\nTu versión anterior tiene estos problemas; corrígelos:\n- " + "\n- ".join(problemas)
     raise ValueError("Criterios inválidos tras varios intentos:\n- " + "\n- ".join(problemas))

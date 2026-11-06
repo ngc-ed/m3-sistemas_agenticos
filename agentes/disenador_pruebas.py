@@ -100,6 +100,7 @@ def disenar_casos(criterios: Path, max_intentos: int = 2) -> Path:
             else [f"No se escribió {rel(destino)}."]
         if not problemas:
             return destino
+        print(f"  Intento {intento} rechazado. Problemas del validador:\n  - " + "\n  - ".join(problemas))
         tarea += "\n\nTu versión anterior tiene estos problemas; corrígelos:\n- " + "\n- ".join(problemas)
     raise ValueError("Casos inválidos tras varios intentos:\n- " + "\n- ".join(problemas))
 

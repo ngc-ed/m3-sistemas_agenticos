@@ -122,6 +122,18 @@ def construir_grafo():
     return app
 
 
+def _preguntar(texto: str, opciones: tuple[str, ...] = ()) -> str:
+    """Pregunta en la terminal hasta recibir una respuesta no vacía y, si hay opciones, una de ellas."""
+    while True:
+        respuesta = input(texto).strip()
+        if not respuesta:
+            print("La respuesta no puede ir vacía.")
+        elif opciones and respuesta.lower() not in opciones:
+            print(f"Responde {' o '.join(opciones)}.")
+        else:
+            return respuesta.lower() if opciones else respuesta
+
+
 def ejecutar(app, historia: str) -> dict:
     """Corre el flujo y atiende cada pausa humana desde la terminal.
 
@@ -137,8 +149,8 @@ def ejecutar(app, historia: str) -> dict:
     hilo = f"{app.name}:{Path(historia).stem}"
     cfg = {"configurable": {"thread_id": hilo}}
     pendientes = [i for tarea in app.get_state(cfg).tasks for i in tarea.interrupts]
-    retomar = bool(pendientes) and input(
-        f"Hay una ejecución en pausa de {hu_de(Path(historia))}. ¿Retomar? (si/no): ").strip().lower() == "si"
+    retomar = bool(pendientes) and _preguntar(
+        f"Hay una ejecución en pausa de {hu_de(Path(historia))}. ¿Retomar? (si/no): ", ("si", "no")) == "si"
     if retomar:
         out = {"__interrupt__": pendientes}             # se vuelve a mostrar la pausa guardada
     else:
@@ -150,7 +162,7 @@ def ejecutar(app, historia: str) -> dict:
             if clave in pausa:
                 print(f"\n--- {clave.upper()} ---\n{pausa[clave]}")
         aviso = {"bitacora": ["Ejecución retomada desde el checkpoint"]} if retomar else None
-        out = app.invoke(Command(resume=input(pausa["pregunta"] + ": "), update=aviso), cfg)
+        out = app.invoke(Command(resume=_preguntar(pausa["pregunta"] + ": "), update=aviso), cfg)
         retomar = False                                 # el aviso se escribe una sola vez
     return out
 
