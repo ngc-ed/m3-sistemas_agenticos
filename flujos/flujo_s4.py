@@ -116,6 +116,12 @@ def reporte(s: Estado) -> Estado:
 
 
 def construir_grafo():
+    """No recibe nada; devuelve el grafo completo de la sesión 4 compilado con el nombre «s4».
+
+    Empieza con el filtro de historia y termina con el reporte. Las pruebas E2E (pytest y Playwright)
+    deciden si se pasa al triage, con un tope de MAX_CICLOS correcciones. Usa el checkpointer
+    SQLite de flujos.util y guarda el dibujo del grafo en flujos/salidas/.
+    """
     g = StateGraph(Estado)
     for nombre, fn in [("filtrar_historia", filtrar_historia), ("analizar", s2.analizar),
                        ("pedir_aclaracion", s2.pedir_aclaracion), ("disenar_casos", s2.disenar),

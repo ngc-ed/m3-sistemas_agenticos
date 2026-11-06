@@ -102,6 +102,11 @@ def fin(s: Estado) -> Estado:
 
 
 def construir_grafo():
+    """No recibe nada; devuelve el grafo de la sesión 2 compilado con el nombre «s2».
+
+    Usa el checkpointer SQLite de flujos.util, así las pausas se pueden retomar. También guarda
+    el dibujo del grafo en flujos/salidas/. La verificación de la app la decide verificar_app.
+    """
     g = StateGraph(Estado)
     for nombre, fn in [("analizar", analizar), ("pedir_aclaracion", pedir_aclaracion),
                        ("disenar_casos", disenar), ("planificar", planificar), ("aprobar_plan", aprobar_plan),

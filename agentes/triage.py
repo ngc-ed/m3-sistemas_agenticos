@@ -43,6 +43,11 @@ Qué manda cuando chocan:
 
 
 def diagnosticar(hu: str, fallos: str) -> Diagnostico:
+    """Recibe la historia (por ejemplo «HU-10») y el log de pruebas fallidas; devuelve un Diagnostico.
+
+    Compara los fallos con los criterios de salida/HU-xx y con contexto/convenciones_app.md.
+    Pydantic valida que el responsable sea desarrollador, automatizador o despliegue.
+    """
     llm = ChatAnthropic(model=os.environ["MODEL"], max_tokens=2000)
     criterios = (SALIDA / hu / "criterios.feature").read_text(encoding="utf-8")
     # El original del que app/CLAUDE.md es copia: así no depende de un archivo que vive dentro de app/

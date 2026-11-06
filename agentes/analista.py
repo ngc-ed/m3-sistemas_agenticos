@@ -32,6 +32,11 @@ def escenarios(gherkin: str) -> list[str]:
 
 
 def preguntas_abiertas(gherkin: str) -> list[str]:
+    """Recibe el texto Gherkin y devuelve las preguntas bajo «# Preguntas abiertas» (lista vacía si no hay).
+
+    Valida que «Ninguna», «No hay» o «N/A» en la primera línea cuenten como cero preguntas,
+    para que el flujo no pause sin necesidad.
+    """
     if "# Preguntas abiertas" not in gherkin:
         return []
     bloque = gherkin.split("# Preguntas abiertas", 1)[1]
@@ -64,6 +69,7 @@ def validar_gherkin(texto: str, hu: str = "") -> list[str]:
 # --- HU-10 · Vacaciones: todo se lee de contexto/, nada se escribe de memoria ---
 
 def _leer_contexto(nombre: str) -> str:
+    """Recibe el nombre de un archivo de contexto/ y devuelve su texto en UTF-8. No valida nada."""
     return (RAIZ / "contexto" / nombre).read_text(encoding="utf-8")
 
 
@@ -157,6 +163,12 @@ def validar_vacaciones(bloques: list[str]) -> list[str]:
 
 
 def generar_criterios(historia: Path, max_intentos: int | None = None) -> Path:
+    """Recibe la ruta de la historia y devuelve la ruta de salida/HU-xx/criterios.feature.
+
+    Valida cada intento con validar_gherkin (y las reglas de HU-10 si aplica). Si hay problemas,
+    se los regresa al agente y reintenta: 3 intentos para HU-10, 2 para las demás.
+    Lanza ValueError si ningún intento pasa.
+    """
     hu = hu_de(historia)
     # HU-10 exige muchos más escenarios: le damos un intento extra; las demás siguen con 2
     max_intentos = max_intentos or (3 if hu == "HU-10" else 2)

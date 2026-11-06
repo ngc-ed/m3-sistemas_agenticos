@@ -85,6 +85,11 @@ def herramienta_guardar_casos(destino: Path) -> Herramienta:
 
 
 def disenar_casos(criterios: Path, max_intentos: int = 2) -> Path:
+    """Recibe la ruta de criterios.feature y devuelve la ruta de casos_prueba.json en la misma carpeta.
+
+    Valida cada intento con validar_plan (JSON válido y cada escenario cubierto). Si hay problemas,
+    se los regresa al agente y reintenta hasta max_intentos. Lanza ValueError si ninguno pasa.
+    """
     carpeta = criterios.parent
     destino = carpeta / "casos_prueba.json"
     lectura = [h for h in herramientas_archivos(lectura=[RAIZ / "contexto", carpeta], escritura=carpeta)
