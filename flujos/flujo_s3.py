@@ -60,6 +60,12 @@ def listo(s: Estado) -> Estado:
 
 
 def construir_grafo():
+    """No recibe nada; devuelve el grafo de la sesión 3 compilado con el nombre «s3».
+
+    Agrega al flujo de la sesión 2 las ramas paralelas de despliegue y automatización, cada una
+    validada por código (verificar_despliegue y verificar_pruebas_escritas). Usa el checkpointer
+    SQLite de flujos.util y guarda el dibujo del grafo en flujos/salidas/.
+    """
     g = StateGraph(Estado)
     for nombre, fn in [("analizar", s2.analizar), ("pedir_aclaracion", s2.pedir_aclaracion),
                        ("disenar_casos", s2.disenar), ("planificar", s2.planificar),
