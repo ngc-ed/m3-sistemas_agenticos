@@ -9,9 +9,12 @@ Armado a partir de `git log`. Las fechas van de la más reciente a la más antig
 - Prueba de seguridad con HU-99: el filtro de historia la bloquea (`salida/bloqueada/reporte.md`).
 - Ejecución 2 de HU-10: backend, frontend y pruebas de vacaciones generados por los agentes; 47 pruebas pasan.
 - Analista y diseñador imprimen los problemas del validador cuando rechazan un intento.
+- Lab 4B con HU-99: prompt ingenuo contra endurecido y analista sin filtro (`salida/HU-99/criterios.feature`).
+- Tabla de ataques y checklist de producción en `salida/seguridad.md`.
 
 ### Cambiado
 - Criterios, casos y pruebas de HU-10 regenerados en la ejecución final (20 casos).
+- Redacción más natural en `salida/HU-10/decisiones.md` y `salida/seguridad.md`.
 
 ### Corregido
 - Analista: no escribe pasos de pantalla que la app no permite; esos escenarios se prueban solo por API.
