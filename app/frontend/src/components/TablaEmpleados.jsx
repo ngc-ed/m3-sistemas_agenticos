@@ -49,13 +49,15 @@ export default function TablaEmpleados({ empleados, onEditar, onDarBaja, onSolic
               >
                 Dar de baja
               </button>
-              <button
-                type="button"
-                data-testid={`vacaciones-abrir-${empleado.id}`}
-                onClick={() => onSolicitarVacaciones?.(empleado)}
-              >
-                Solicitar vacaciones
-              </button>
+              {empleado.estado === 'activo' && (
+                <button
+                  type="button"
+                  data-testid={`vacaciones-abrir-${empleado.id}`}
+                  onClick={() => onSolicitarVacaciones?.(empleado)}
+                >
+                  Solicitar vacaciones
+                </button>
+              )}
             </td>
           </tr>
         ))}
