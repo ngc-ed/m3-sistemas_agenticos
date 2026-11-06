@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import FormularioEmpleado from './components/FormularioEmpleado.jsx'
 import FormularioEdicion from './components/FormularioEdicion.jsx'
 import FormularioBaja from './components/FormularioBaja.jsx'
+import FormularioVacaciones from './components/FormularioVacaciones.jsx'
 import FiltrosDirectorio from './components/FiltrosDirectorio.jsx'
 import TablaEmpleados from './components/TablaEmpleados.jsx'
 import { obtenerEmpleados } from './api.js'
@@ -61,6 +62,14 @@ export default function App() {
         />
       )}
 
+      {modo === 'vacaciones' && empleadoSeleccionado && (
+        <FormularioVacaciones
+          key={intentoAccion}
+          empleadoId={empleadoSeleccionado.id}
+          onCancelar={volverAAlta}
+        />
+      )}
+
       <FiltrosDirectorio
         busqueda={busqueda}
         departamento={departamento}
@@ -76,6 +85,11 @@ export default function App() {
         onDarBaja={(empleado) => {
           setEmpleadoSeleccionado(empleado)
           setModo('baja')
+          setIntentoAccion((valor) => valor + 1)
+        }}
+        onSolicitarVacaciones={(empleado) => {
+          setEmpleadoSeleccionado(empleado)
+          setModo('vacaciones')
           setIntentoAccion((valor) => valor + 1)
         }}
       />
