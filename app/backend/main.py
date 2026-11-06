@@ -6,6 +6,7 @@ from fastapi.responses import JSONResponse
 
 from base_datos import Base, motor
 from rutas_empleados import router as router_empleados
+from rutas_vacaciones import router as router_vacaciones
 
 Base.metadata.create_all(bind=motor)
 
@@ -31,3 +32,4 @@ def salud():
 
 
 app.include_router(router_empleados, prefix="/api")
+app.include_router(router_vacaciones, prefix="/api")
