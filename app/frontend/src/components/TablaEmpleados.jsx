@@ -3,7 +3,7 @@ const ETIQUETAS_ESTADO = {
   baja: 'Baja',
 }
 
-export default function TablaEmpleados({ empleados, onEditar, onDarBaja }) {
+export default function TablaEmpleados({ empleados, onEditar, onDarBaja, onSolicitarVacaciones }) {
   if (empleados.length === 0) {
     return <p data-testid="sin-resultados">No se encontraron empleados</p>
   }
@@ -49,6 +49,15 @@ export default function TablaEmpleados({ empleados, onEditar, onDarBaja }) {
               >
                 Dar de baja
               </button>
+              {empleado.estado === 'activo' && (
+                <button
+                  type="button"
+                  data-testid={`vacaciones-abrir-${empleado.id}`}
+                  onClick={() => onSolicitarVacaciones?.(empleado)}
+                >
+                  Solicitar vacaciones
+                </button>
+              )}
             </td>
           </tr>
         ))}

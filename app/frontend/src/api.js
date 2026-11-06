@@ -58,3 +58,22 @@ export async function darDeBajaEmpleado(numeroEmpleado, fechaBaja) {
   })
   return manejarRespuesta(respuesta)
 }
+
+export async function solicitarVacaciones(empleadoId, datos) {
+  const respuesta = await fetch(`/api/empleados/${empleadoId}/vacaciones`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(datos),
+  })
+  return manejarRespuesta(respuesta)
+}
+
+export async function obtenerSaldoVacaciones(empleadoId, anio) {
+  const parametros = new URLSearchParams()
+  if (anio) parametros.set('anio', anio)
+  const query = parametros.toString()
+  const respuesta = await fetch(
+    `/api/empleados/${empleadoId}/vacaciones${query ? `?${query}` : ''}`
+  )
+  return manejarRespuesta(respuesta)
+}

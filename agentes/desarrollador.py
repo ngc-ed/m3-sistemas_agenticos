@@ -11,7 +11,18 @@ from agentes.claude_code import EDICION, SOLO_LECTURA, ejecutar_claude_code
 INSTRUCCIONES = """Eres el desarrollador full stack del equipo. Construyes la aplicación de gestión de empleados
 de la empresa siguiendo CLAUDE.md al pie de la letra (stack, puertos y data-testid).
 No escribes pruebas automatizadas ni archivos de Docker: de eso se encargan otros agentes.
-Las dependencias de Python ya están instaladas; en frontend/ sí puedes usar npm install."""
+Las dependencias de Python ya están instaladas; en frontend/ sí puedes usar npm install.
+Los data-testid y los mensajes se copian de CLAUDE.md (copia de contexto/convenciones_app.md) letra por letra;
+no inventas ninguno.
+
+En vacaciones (HU-10):
+- Los días hábiles se calculan en el backend, con la tabla de festivos de 2026 y 2027 de las reglas de negocio
+  (contexto/reglas_negocio.md, te llegan en el prompt).
+- Las validaciones siguen el orden de la tabla de errores de CLAUDE.md: se devuelve el primer error que aplique.
+- Agregas la tabla vacaciones y, si falta, el campo fecha_ingreso, sin cambiar el comportamiento de HU-01 a HU-03.
+- La pantalla muestra en vacaciones-mensaje el detail exacto que devuelve la API, o el mensaje de éxito exacto.
+- El botón vacaciones-abrir-{empleado_id} solo aparece en empleados activos.
+- El POST responde dias_restantes y el GET responde dias_disponibles. Si no se manda anio, se usa el año en curso."""
 
 ESCRITURA = ["backend/*", "frontend/*"]
 PROGRAMAS = {"cd", "ls", "cat", "mkdir", "npm", "npx", "node", "python", "python3", "curl", "sleep", "kill"}

@@ -36,6 +36,12 @@ Cómo trabajas:
 2. Para cada escenario escribe al menos un caso de nivel "api". Si el escenario involucra la pantalla,
    escribe además uno de nivel "e2e" cuyos pasos mencionen los data-testid que se usan.
 3. Usa datos concretos. Para correos usa el dominio corporativo empresa.com.
+   En vacaciones (HU-10) lee también contexto/reglas_negocio.md. Cada caso indica en "datos" la fecha_ingreso
+   del empleado (pasada, nunca futura) y fechas fijas de 2026 o 2027 en formato AAAA-MM-DD, tomadas de las
+   tablas de ejemplos y de festivos. Nunca uses la fecha de hoy ni fechas relativas («hoy», «mañana»).
+   En las consultas de saldo indica siempre "anio". Si el caso necesita días ya usados (tope), lista
+   en "datos" cada solicitud previa con sus fechas. El caso de empleado inexistente indica un empleado_id
+   que no existe en lugar de fecha_ingreso.
 4. Guarda los casos llamando a la herramienta guardar_casos (no escribas el JSON a mano).
    - "nivel" solo puede ser "api" o "e2e".
    - En "datos" TODOS los valores son texto: "201", no 201; para un campo vacío usa "", nunca null.
@@ -79,6 +85,11 @@ def herramienta_guardar_casos(destino: Path) -> Herramienta:
 
 
 def disenar_casos(criterios: Path, max_intentos: int = 2) -> Path:
+    """Recibe la ruta de criterios.feature y devuelve la ruta de casos_prueba.json en la misma carpeta.
+
+    Valida cada intento con validar_plan (JSON válido y cada escenario cubierto). Si hay problemas,
+    se los regresa al agente y reintenta hasta max_intentos. Lanza ValueError si ninguno pasa.
+    """
     carpeta = criterios.parent
     destino = carpeta / "casos_prueba.json"
     lectura = [h for h in herramientas_archivos(lectura=[RAIZ / "contexto", carpeta], escritura=carpeta)
@@ -94,6 +105,7 @@ def disenar_casos(criterios: Path, max_intentos: int = 2) -> Path:
             else [f"No se escribió {rel(destino)}."]
         if not problemas:
             return destino
+        print(f"  Intento {intento} rechazado. Problemas del validador:\n  - " + "\n  - ".join(problemas))
         tarea += "\n\nTu versión anterior tiene estos problemas; corrígelos:\n- " + "\n- ".join(problemas)
     raise ValueError("Casos inválidos tras varios intentos:\n- " + "\n- ".join(problemas))
 

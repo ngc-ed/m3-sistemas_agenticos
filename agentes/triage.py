@@ -8,7 +8,7 @@ from typing import Literal
 from langchain_anthropic import ChatAnthropic
 from pydantic import BaseModel
 
-from agentes.base import SALIDA
+from agentes.base import RAIZ, SALIDA
 
 
 class Diagnostico(BaseModel):
@@ -22,7 +22,18 @@ PROMPT = """Eres líder técnico. Unas pruebas automatizadas fallaron. Decide qu
 - "desarrollador": la aplicación no cumple un criterio de aceptación.
 - "automatizador": la prueba contradice el criterio, usa un selector incorrecto o es frágil.
 - "despliegue": la aplicación no responde (conexión rechazada, 502, contenedor caído).
-El criterio de aceptación manda: si la prueba y la aplicación no coinciden, gana quien siga el criterio.
+
+Antes de culpar al desarrollador, compara lo que pide la prueba con CLAUDE.md (convenciones de la app, abajo).
+Si la prueba pide algo que la convención no permite (por ejemplo, el botón de vacaciones, que solo tienen los
+empleados activos, usado con un empleado de baja), la falla es de la prueba: responsable "automatizador".
+
+Qué manda cuando chocan:
+1. Si un criterio o una prueba contradice CLAUDE.md, manda CLAUDE.md y la falla va al "automatizador".
+2. En los demás casos manda el criterio de aceptación: si la prueba y la aplicación no coinciden,
+   gana quien siga el criterio.
+
+## CLAUDE.md (convenciones de la app)
+{convenciones}
 
 ## Criterios de aceptación
 {criterios}
@@ -32,6 +43,14 @@ El criterio de aceptación manda: si la prueba y la aplicación no coinciden, ga
 
 
 def diagnosticar(hu: str, fallos: str) -> Diagnostico:
+    """Recibe la historia (por ejemplo «HU-10») y el log de pruebas fallidas; devuelve un Diagnostico.
+
+    Compara los fallos con los criterios de salida/HU-xx y con contexto/convenciones_app.md.
+    Pydantic valida que el responsable sea desarrollador, automatizador o despliegue.
+    """
     llm = ChatAnthropic(model=os.environ["MODEL"], max_tokens=2000)
     criterios = (SALIDA / hu / "criterios.feature").read_text(encoding="utf-8")
-    return llm.with_structured_output(Diagnostico).invoke(PROMPT.format(criterios=criterios, fallos=fallos[:6000]))
+    # El original del que app/CLAUDE.md es copia: así no depende de un archivo que vive dentro de app/
+    convenciones = (RAIZ / "contexto" / "convenciones_app.md").read_text(encoding="utf-8")
+    return llm.with_structured_output(Diagnostico).invoke(
+        PROMPT.format(convenciones=convenciones, criterios=criterios, fallos=fallos[:6000]))

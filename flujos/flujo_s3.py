@@ -6,7 +6,6 @@ Uso:  python -m flujos.flujo_s3 historias/HU-01-registrar-empleado.md
 import sys
 from typing import Literal
 
-from langgraph.checkpoint.memory import InMemorySaver
 from langgraph.graph import END, START, StateGraph
 
 from agentes.automatizador import automatizar as agente_automatizador
@@ -15,7 +14,7 @@ from agentes.disenador_pruebas import PlanPruebas
 from flujos import flujo_s2 as s2
 from flujos.verificacion import verificar_despliegue, verificar_pruebas_escritas
 from pathlib import Path
-from flujos.util import dibuja_grafo
+from flujos.util import crear_checkpointer, dibuja_grafo
 
 
 class Estado(s2.Estado, total=False):
@@ -61,6 +60,12 @@ def listo(s: Estado) -> Estado:
 
 
 def construir_grafo():
+    """No recibe nada; devuelve el grafo de la sesión 3 compilado con el nombre «s3».
+
+    Agrega al flujo de la sesión 2 las ramas paralelas de despliegue y automatización, cada una
+    validada por código (verificar_despliegue y verificar_pruebas_escritas). Usa el checkpointer
+    SQLite de flujos.util y guarda el dibujo del grafo en flujos/salidas/.
+    """
     g = StateGraph(Estado)
     for nombre, fn in [("analizar", s2.analizar), ("pedir_aclaracion", s2.pedir_aclaracion),
                        ("disenar_casos", s2.disenar), ("planificar", s2.planificar),
@@ -79,7 +84,7 @@ def construir_grafo():
     g.add_edge(["desplegar", "automatizar"], "listo")                  # espera a que terminen ambas ramas
     g.add_edge("listo", "fin")
     g.add_edge("fin", END)
-    app = g.compile(checkpointer=InMemorySaver())
+    app = g.compile(checkpointer=crear_checkpointer(), name="s3")   # name: prefijo del thread_id
     #YA DIBUJA EL GRAFO ! 
     dibuja_grafo(app,"flujo_s3")
     return app
